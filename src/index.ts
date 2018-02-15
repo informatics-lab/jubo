@@ -1,12 +1,11 @@
 import {
-  JupyterLab, JupyterLabPlugin
+  JupyterLab, JupyterLabPlugin, ILayoutRestorer
 } from '@jupyterlab/application';
 
-import { ICommandPalette } from '@jupyterlab/apputils';
+import { ICommandPalette, InstanceTracker } from '@jupyterlab/apputils';
 import { Widget } from '@phosphor/widgets';
-
+import {JSONExt} from '@phosphor/coreutils';
 import '../style/index.css';
-import { DOMElement } from 'react';
 import { Message } from '@phosphor/messaging';
 
 
@@ -45,20 +44,36 @@ class XkcdWidget extends Widget {
 }
 
 
-function activate(app: JupyterLab, palette: ICommandPalette) {
+function activate(app: JupyterLab, palette: ICommandPalette, restorer:ILayoutRestorer) {
   console.log('JupyterLab extension xkcd_ext is activated!');
-  let widget: XkcdWidget = new XkcdWidget();
+  let widget: XkcdWidget;// = new XkcdWidget();
   const command: string = 'xkcd:open';
   app.commands.addCommand(command, {
     label: 'Random xkcd commic',
     execute: () => {
+      if(!widget){
+        widget = new XkcdWidget();
+        widget.update();
+      }
+      if(!tracker.has(widget)){
+        tracker.add(widget);
+      }
       if (!widget.isAttached) {
         app.shell.addToMainArea(widget);
+      } else {
+        widget.update();
       }
       app.shell.activateById(widget.id);
     }
   })
   palette.addItem({ command: command, category: "Tutorial" });
+
+  let tracker = new InstanceTracker<Widget>({namespace:'xkcd'});
+  restorer.restore(tracker, {
+    command,
+    args: () => JSONExt.emptyObject,
+    name: () => 'xkcd'
+  })
 }
 
 
@@ -68,7 +83,7 @@ function activate(app: JupyterLab, palette: ICommandPalette) {
 const extension: JupyterLabPlugin<void> = {
   id: 'xkcd_ext',
   autoStart: true,
-  requires: [ICommandPalette],
+  requires: [ICommandPalette, ILayoutRestorer],
   activate: activate
 };
 
