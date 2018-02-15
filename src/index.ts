@@ -22,6 +22,17 @@ const extension: JupyterLabPlugin<void> = {
     widget.title.label = 'xkcd.com';
     widget.title.closable = true;
 
+    let img = document.createElement('img');
+    widget.node.appendChild(img);
+
+    fetch('https:////egszlpbmle.execute-api.us-east-1.amazonaws.com/prod').then(response=>{
+      return response.json();
+    }) .then(data => {
+      img.src = data.img;
+      img.alt = data .title;
+      img.title = data.alt;
+    });
+
     const command:string = 'xkcd:open';
     app.commands.addCommand(command, {
       label: 'Random xkcd commic',
@@ -34,7 +45,7 @@ const extension: JupyterLabPlugin<void> = {
     })
 
     palette.addItem({command:command, category:"Tutorial"});
-    
+
   }
 };
 
