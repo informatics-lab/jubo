@@ -1,3 +1,10 @@
+# Stuff I've done 
+```pip install gfm
+jupyter lab --NotebookApp.nbserver_extensions="{'jubo.hello':True}" 
+ python jubo/convert.py && bokeh serve outputs.ipynb.py         
+```
+
+
 # xkcd_ext
 
 A JupyterLab extension.
