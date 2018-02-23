@@ -1,0 +1,71 @@
+# Deployment
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: juboapps
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: juboapps
+    spec:
+      containers:
+        - image: informaticslab/singleuser-notebook:latest
+          command: ["bash"]
+          args: ['-c', "bokeh serve --port=6666 --allow-websocket-origin=juboapps.informaticslab.co.uk /s3/jubo-apps/*"]
+          name: juboapps
+          ports:
+            - containerPort: 6666
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+          volumeMounts:
+            - name: s3
+              mountPath: /s3
+
+      volumes:
+        - name: s3
+          flexVolume:
+              driver: "informaticslab/s3-fuse-flex-volume"
+              options:
+                readonly: "true"
+
+---
+
+# Service
+kind: Service
+metadata:
+  name: juboapps
+spec:
+  ports:
+    - port: 80
+      targetPort: 6666
+      protocol: TCP
+  selector:
+    app: juboapps
+
+---
+
+# Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: juboapps.informaticslab.co.uk
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - juboapps.informaticslab.co.uk
+    secretName: bokeh-tls
+  rules:
+  - host: juboapps.informaticslab.co.uk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: juboapps
+          servicePort: 80

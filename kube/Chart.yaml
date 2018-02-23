@@ -1,0 +1,7 @@
+apiVersion: v1
+name: judoapps
+version: 0.1.5
+description: A jupyter bokeh experiment
+maintainers: 
+  - name: Theo McCaie
+    email: theo.mccaien@informaticslab.co.uk

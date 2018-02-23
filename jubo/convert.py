@@ -6,7 +6,7 @@ import gfm
 prefix_code = """
 from bokeh.models.widgets import Div
 from bokeh.models.widgets import PreText
-from bokeh.layouts import column
+from bokeh.layouts import column, row, layout
 from bokeh.io import curdoc
 from bokeh.models import Model
 import bokeh.io
@@ -16,6 +16,12 @@ bokeh.io.output_notebook = lambda : None
 """
 
 postfix_code = """
+def add_css_class(widget, css_class):
+    styles = widget.css_classes
+    styles = styles if styles else []
+    styles.append(css_class)
+    widget.css_classes = styles
+
 widgets = []
 for o in [item for item in outputs if item]:
     if isinstance(o, Model):
@@ -24,9 +30,10 @@ for o in [item for item in outputs if item]:
         widget = Div(text=o.__html__())
     else:
         widget = PreText(text=str(o))
+    widget.sizing_mode = "scale_width"
+    add_css_class(widget, 'jubo_widget_row')
     widgets.append(widget)
-
-curdoc().add_root(column(*widgets))
+curdoc().add_root(layout(widgets, responsive=True))
 """
 
 def skip(*arg, **kwargs):
@@ -50,7 +57,8 @@ def parse_code_cell(cell, app):
 
 def parse_markdown_cell(cell, app):
     html = gfm.markdown(cell['source'])
-    app['outputs'].append({'id':'Div(text="""{}""")'.format(html)})
+    app['outputs'].append({'id':''.format(html)})
+    app['code'].append('outputs.append(Div(text="""{html}"""))'.format(html=html))
 
 
 def convert(filepath):
