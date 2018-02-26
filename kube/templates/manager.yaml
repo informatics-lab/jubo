@@ -2,49 +2,65 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: juboapps
+  name: {{ .Values.manager.name }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: juboapps
+        app: {{ .Values.manager.name }}
     spec:
+      serviceAccountName: {{ .Values.manager.name }}
       containers:
-        - image: informaticslab/singleuser-notebook:latest
-          command: ["bash"]
-          args: ['-c', "bokeh serve --port=6666 --allow-websocket-origin=juboapps.informaticslab.co.uk /s3/jubo-apps/*"]
-          name: juboapps
+        - image: informaticslab/singleuser-notebook:0.3.0
+          command: ["python"]
+          args: ["-m", "jubo.proxy"]
+          #args: ["-c", "import time; time.sleep(1000)"]
+          name: {{ .Values.manager.name }}
           ports:
-            - containerPort: 6666
+            - containerPort: 7777
           resources:
             requests:
-              cpu: 100m
-              memory: 1Gi
+              cpu: 10m
+              memory: 250Mi
+          env:
+            - name: MARK_AS_REAPABLE_LABEL
+              value: {{ .Values.reaper.reapOnly.label }}
+            - name: MARK_AS_REAPABLE_LABEL_VALUE
+              value: {{ .Values.reaper.reapOnly.value }}
+            - name: NAME_SPACE
+              value: {{ .Release.Namespace }}
+            - name: PYTHONPATH
+              value: /home/jovyan
+  
           volumeMounts:
-            - name: s3
-              mountPath: /s3
-
+            - name: jubomodule
+              mountPath: /home/jovyan/jubo
       volumes:
-        - name: s3
-          flexVolume:
-              driver: "informaticslab/s3-fuse-flex-volume"
-              options:
-                readonly: "true"
+        - name: jubomodule
+          configMap:
+            name: jubomodule
 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jubomodule
+data:
+{{ (.Files.Glob "jubo/*.py").AsConfig | indent 2 }}
 ---
 
 # Service
 kind: Service
 metadata:
-  name: juboapps
+  name: {{ .Values.manager.name }}
 spec:
   ports:
     - port: 80
-      targetPort: 6666
+      targetPort: 7777
       protocol: TCP
   selector:
-    app: juboapps
+    app: {{ .Values.manager.name }}
 
 ---
 
@@ -52,20 +68,50 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: juboapps.informaticslab.co.uk
+  name: {{ .Values.manager.domain }}
   annotations:
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
   tls:
   - hosts:
-    - juboapps.informaticslab.co.uk
+    - {{ .Values.manager.domain }}
     secretName: bokeh-tls
   rules:
-  - host: juboapps.informaticslab.co.uk
+  - host: {{ .Values.manager.domain }}
     http:
       paths:
       - path: /
         backend:
-          serviceName: juboapps
+          serviceName: {{ .Values.manager.name }}
           servicePort: 80
+
+
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.manager.name }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ .Values.manager.name }}
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["create", "get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.manager.name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.manager.name }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.manager.name }}
+    Namespace: {{ .Release.Namespace }}

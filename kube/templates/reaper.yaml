@@ -2,51 +2,61 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: jubo-reaper
+  name: {{ .Values.reaper.name }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: jubo-reaper
+        app: {{ .Values.reaper.name }}
     spec:
+      serviceAccountName: {{ .Values.reaper.name }}
       containers:
         - image: target/pod-reaper:latest
-          name: jubo-reaper
+          name: {{ .Values.reaper.name }}
           resources:
             requests:
               cpu: 10m
               memory: 128Mi
-
-
-
+          env:
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: SCHEDULE
+              value: "@every 1m"
+            - name: REQUIRE_LABEL_KEY
+              value: {{ .Values.reaper.reapOnly.label }}
+            - name: REQUIRE_LABEL_VALUES
+              value: {{ .Values.reaper.reapOnly.value }}
+            - name: MAX_DURATION
+              value: "5m"
+            
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: jubo-reaper
+  name: {{ .Values.reaper.name }}
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: jubo-reaper
+  name: {{ .Values.reaper.name }}
 rules:
 - apiGroups: [""]
   resources: ["pods"]
-  resourceNames: ["dask-workers"]
-  verbs: ["update", "get"]
+  verbs: ["delete", "get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: jubo-reaper
+  name: {{ .Values.reaper.name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: jubo-reaper
+  name: {{ .Values.reaper.name }}
 subjects:
   - kind: ServiceAccount
-    name: jubo-reaper
+    name: {{ .Values.reaper.name }}
+    Namespace: {{ .Release.Namespace }}
 
 

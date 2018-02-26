@@ -1,5 +1,9 @@
 manager:
   name: jubo-manager
+  domain: juboapps.informaticslab.co.uk
 
 reaper:
   name: jubo-reaper
+  reapOnly:
+    label: jubo-reapable 
+    value: reap
