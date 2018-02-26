@@ -5,9 +5,9 @@ jupyter lab --NotebookApp.nbserver_extensions="{'jubo.hello':True}"
 ```
 
 
-# xkcd_ext
+# JuBo
 
-A JupyterLab extension.
+A JupyterLab and server extension to create bokeh apps.
 
 
 ## Prerequisites
@@ -16,9 +16,7 @@ A JupyterLab extension.
 
 ## Installation
 
-```bash
-jupyter labextension install xkcd_ext
-```
+TBC
 
 ## Development
 
@@ -30,10 +28,20 @@ npm run build
 jupyter labextension link .
 ```
 
-To rebuild the package and the JupyterLab app:
+If developing the lab extention run in watchmode and re-run `npm run build` on changes:
 
 ```bash
-npm run build
-jupyter lab build
+jupyter lab --NotebookApp.nbserver_extensions="{'jubo.hello':True}" --no-browser --watch
 ```
+
+If working on server-side drop the watch and quit and restart to see changes.
+
+
+```bash
+jupyter lab --NotebookApp.nbserver_extensions="{'jubo.hello':True}" --no-browser
+```
+
+
+
+
 

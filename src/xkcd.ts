@@ -97,6 +97,12 @@ class JuboWidget extends Widget {
     fetch('../jubo/list').then(response => {
       return response.json();
     }).then(data => {
+      data.sort();
+      let newHash:string = data.reduce((a:string, b:string) => a + b, '');
+      let oldHash = this.select.getAttribute('data-hash');
+      if (oldHash === newHash){ // Break early if no change.
+        return;
+      }
       let origVal = this.select.value;
       while (this.select.firstChild) {
         this.select.removeChild(this.select.firstChild);
@@ -108,6 +114,7 @@ class JuboWidget extends Widget {
         this.select.appendChild(opt);
       });
       this.select.value = origVal;
+      this.select.setAttribute('data-hash', newHash);
     })
   }
 
