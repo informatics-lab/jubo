@@ -12,7 +12,9 @@ import { Message } from '@phosphor/messaging';
 class JuboWidget extends Widget {
   container: HTMLDivElement;
   select:HTMLSelectElement;
+  deployBtn:HTMLButtonElement;
   script:HTMLScriptElement;
+  infoP:HTMLParagraphElement;
 
   constructor() {
     super();
@@ -21,15 +23,49 @@ class JuboWidget extends Widget {
     this.title.closable = true;
     this.addClass('jp-juboWidget');
     this.script = document.createElement("script");
-
+    this.deployBtn = document.createElement('button');
+    this.deployBtn.value = "deploy";
+    this.deployBtn.innerText = "Deploy";
+    this.infoP = document.createElement('p');
     this.container = document.createElement('div');
     this.container.className = 'jp-juboContainer';
     this.select = document.createElement('select')
+    this.select = document.createElement('select')
     this.node.appendChild(this.select);
+    this.node.appendChild(this.deployBtn);
+    this.node.appendChild(this.infoP);
     this.node.appendChild(this.container);
     this.updateSelect();
+    setInterval(() => this.updateSelect(), 3000); // TODO: be more clever about this?
+    this.deployBtn.addEventListener('click', (e) => this.deploy(e));
     this.select.addEventListener('change', (e) => this.renderNotebook(e));
     this.select.value = '';
+  }
+
+  deploy(e:Event):void{
+    let path = this.select.value;
+    this.clearDocument();
+    if(!path){
+      this.showMsg('No app selected.');
+      return;
+    }
+    fetch('../jubo/deploy/' + path).then(response => {
+      return response.json();
+    }).then( data => {
+      if(data.result == 'success') {
+        let url = 'https://juboapps.informaticslab.co.uk/app/' + data.id + '/' + data.id;
+        let msg = `Deployed at <a target="_blank" href="${url}" title="Your app">${url}</a>. Any new changes will not be reflected at this url.`
+        this.showMsg(msg);
+      } else {
+        console.log("Failed", data);
+        this.showMsg("sorry that failed. see the console, there might be more info.");
+      }
+    });
+
+  }
+
+  showMsg(msg:string):void {
+    this.infoP.innerHTML = msg;
   }
 
   renderNotebook(e:Event):void{
@@ -61,6 +97,7 @@ class JuboWidget extends Widget {
     fetch('../jubo/list').then(response => {
       return response.json();
     }).then(data => {
+      let origVal = this.select.value;
       while (this.select.firstChild) {
         this.select.removeChild(this.select.firstChild);
       }
@@ -70,6 +107,7 @@ class JuboWidget extends Widget {
         opt.innerText = path;
         this.select.appendChild(opt);
       });
+      this.select.value = origVal;
     })
   }
 
