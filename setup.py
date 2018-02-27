@@ -67,6 +67,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Framework :: Jupyter'
     ],
 
     # What does your project relate to?
@@ -84,7 +85,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['boto3','bokeh','gfm','tornado','jupyter'],
+    install_requires=['boto3','bokeh','gfm','tornado','notebook']
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -114,4 +115,5 @@ setup(
     #         'pysssix=pysssix:main',
     #     ],
     # }
+
 )
