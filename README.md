@@ -14,7 +14,8 @@ Three main components parts:
 
 ## Installation
 
-TBC
+pip install git+https://github.com/met-office-lab/jubo.git
+npm install git+https://github.com/met-office-lab/jubo.git  
 
 ## Development
 

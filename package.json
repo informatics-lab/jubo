@@ -22,7 +22,7 @@
     "types": "lib/index.d.ts",
     "repository": {
         "type": "git",
-        "url": "https://github.com/met-office-lab/jupyterlab-bokeh-convert.git"
+        "url": "https://github.com/met-office-lab/jubo.git"
     },
     "scripts": {
         "build": "tsc",
