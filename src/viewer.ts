@@ -158,7 +158,7 @@ function activate(app: JupyterLab, palette: ICommandPalette, restorer:ILayoutRes
 
 
 /**
- * Initialization data for the xkcd_ext extension.
+ * Initialization data for the jubo_lab extension.
  */
 const extension: JupyterLabPlugin<void> = {
   id: 'jubo_ext',

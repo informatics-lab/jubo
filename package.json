@@ -1,5 +1,5 @@
 {
-    "name": "jubo_ext",
+    "name": "jubo_lab",
     "version": "0.1.0",
     "description": "A JupyterLab and Jupyter Server extension for converting notebooks into bokeh apps.",
     "keywords": [
@@ -9,9 +9,9 @@
         "jubo",
         "bokeh"
     ],
-    "homepage": "https://github.com/met-office-lab/jupyterlab-bokeh-convert",
+    "homepage": "https://github.com/met-office-lab/jubo",
     "bugs": {
-        "url": "https://github.com/met-office-lab/jupyterlab-bokeh-convert/issues"
+        "url": "https://github.com/met-office-lab/jubo/issues"
     },
     "author": "theo.mccaie",
     "files": [
