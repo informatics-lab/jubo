@@ -1,0 +1,1 @@
+from .jubo_server_ext import load_jupyter_server_extension
