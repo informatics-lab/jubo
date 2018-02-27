@@ -15,7 +15,7 @@ Three main components parts:
 ## Installation
 
 pip install git+https://github.com/met-office-lab/jubo.git
-npm install git+https://github.com/met-office-lab/jubo.git  
+jupyter labextension install https://github.com/met-office-lab/jubo.git  
 
 ## Development
 
