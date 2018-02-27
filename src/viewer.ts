@@ -125,11 +125,11 @@ class JuboWidget extends Widget {
 
 
 function activate(app: JupyterLab, palette: ICommandPalette, restorer:ILayoutRestorer) {
-  console.log('JupyterLab extension jubo is activated!');
-  let widget: JuboWidget;// = new XkcdWidget();
-  const command: string = 'xkcd:open';
+  console.log('JupyterLab extension JuBo is activated!');
+  let widget: JuboWidget;
+  const command: string = 'jubo:open';
   app.commands.addCommand(command, {
-    label: 'Random xkcd commic',
+    label: 'JuBo app view and deploy',
     execute: () => {
       if(!widget){
         widget = new JuboWidget();
@@ -146,13 +146,13 @@ function activate(app: JupyterLab, palette: ICommandPalette, restorer:ILayoutRes
       app.shell.activateById(widget.id);
     }
   })
-  palette.addItem({ command: command, category: "Tutorial" });
+  palette.addItem({ command: command, category: "JuBo" });
 
-  let tracker = new InstanceTracker<Widget>({namespace:'xkcd'});
+  let tracker = new InstanceTracker<Widget>({namespace:'jubo'});
   restorer.restore(tracker, {
     command,
     args: () => JSONExt.emptyObject,
-    name: () => 'xkcd'
+    name: () => 'jubo'
   })
 }
 
@@ -161,7 +161,7 @@ function activate(app: JupyterLab, palette: ICommandPalette, restorer:ILayoutRes
  * Initialization data for the xkcd_ext extension.
  */
 const extension: JupyterLabPlugin<void> = {
-  id: 'xkcd_ext',
+  id: 'jubo_ext',
   autoStart: true,
   requires: [ICommandPalette, ILayoutRestorer],
   activate: activate
