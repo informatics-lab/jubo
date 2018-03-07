@@ -16,7 +16,10 @@ import json
 from uuid import uuid4 as uuid
 import io
 import boto3
+import random
+import re
 
+localhost_url_matcher = re.compile(r"(https?)://localhost:([0-9]+)")
 
 s3 = boto3.client('s3')
 
@@ -63,40 +66,46 @@ class DeployHandler(JuboHandler):
 
 class AppHandler(JuboHandler):
     def get(self, app):
+        protocol = 'https' if self.get_argument('https', default='false').upper() == 'TRUE' else 'http'
+        origin = self.get_argument('origin', default='localhost:{port}' )
+        prefix = self.get_argument('prefix', default='/')
+        prefix = prefix + '/' if not prefix[-1] == '/' else prefix 
         
+
         path =  self._full_path(app)
         code = convert(path)
-        print(code)
         app = Application(CodeHandler(source=code, filename='dynamic_notebook_convert'))
-
-        
 
         loop = IOLoop.current()
 
         # TODO: Work this outsome how
-        # origin = nb_server_app.web_app.settings.get('allow_origin',None)
-        notebook_url = 'localhost:8888'
-
-
-    
-        server = Server({"/": app}, io_loop=loop, port=0,  allow_websocket_origin=[notebook_url])
+        port = random.randint(1024, 65535) # TODO: Should check if this is taken or not...
+        
+        origin = origin.replace("{port}", str(port))
+        prefix = prefix.replace("{port}", str(port))
+        server = Server({"/": app}, io_loop=loop, port=port, allow_websocket_origin=['localhost:%d'%port, origin, self.request.host])
 
         # TODO: track and kill off servers?
         # server_id = uuid4().hex
         # curstate().uuid_to_server[server_id] = server
 
         server.start()
-        port = server.port
-        if notebook_url.startswith("http"):
-            url =  '%s:%d%s' % (notebook_url.rsplit(':', 1)[0], port, "/")
-        else:
-            url = 'http://%s:%d%s' % (notebook_url.split(':')[0], port, "/")
+
+        orig_script = server_document('http://localhost:{port}/'.format(port=port), relative_urls=True)
+        print(orig_script)
+        ele_id = re.findall(r'\bid="([-A-z0-9]+)"', orig_script)[0]
+        script = """<script
+            src="{protocol}://{origin}{prefix}autoload.js?bokeh-autoload-element={ele_id}&bokeh-absolute-url={protocol}://{origin}&bokeh-app-path={prefix}"
+            id="{ele_id}"
+            data-bokeh-model-id=""
+            data-bokeh-doc-id=""
+        ></script>""".format(protocol=protocol, origin=origin, prefix=prefix, ele_id=ele_id) 
+
+        self.set_header('Content-Type', 'application/json')
+        self.finish(json.dumps({'script':script}))
 
 
         
-        script = server_document(url)
-        self.set_header('Content-Type', 'application/json')
-        self.finish(json.dumps({'script':script}))
 
 
 def load_jupyter_server_extension(nb_server_app):
@@ -106,6 +115,7 @@ def load_jupyter_server_extension(nb_server_app):
     Args:
         nb_server_app (NotebookWebApplication): handle to the Notebook webserver instance.
     """
+
     web_app = nb_server_app.web_app
     host_pattern = '.*$'
 

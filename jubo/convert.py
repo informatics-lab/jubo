@@ -16,6 +16,7 @@ bokeh.io.output_notebook = lambda : None
 """
 
 postfix_code = """
+print(outputs)
 def add_css_class(widget, css_class):
     styles = widget.css_classes
     styles = styles if styles else []
@@ -24,16 +25,20 @@ def add_css_class(widget, css_class):
 
 widgets = []
 for o in [item for item in outputs if item]:
+    print("do %s" % o)
     if isinstance(o, Model):
+        print("is model")
         widget = o
     elif hasattr(o,'__html__'):
+        print("is html")
         widget = Div(text=o.__html__())
     else:
+        print("is text")
         widget = PreText(text=str(o))
     widget.sizing_mode = "scale_width"
     add_css_class(widget, 'jubo_widget_row')
     widgets.append(widget)
-curdoc().add_root(layout(widgets, responsive=True))
+curdoc().add_root(layout(widgets, sizing_mode='scale_width'))
 """
 
 def skip(*arg, **kwargs):
@@ -57,7 +62,7 @@ def parse_code_cell(cell, app):
 
 def parse_markdown_cell(cell, app):
     html = gfm.markdown(cell['source'])
-    app['outputs'].append({'id':''.format(html)})
+    # app['outputs'].append({'id':''.format(html)})
     app['code'].append('outputs.append(Div(text="""{html}"""))'.format(html=html))
 
 
@@ -82,6 +87,8 @@ def convert(filepath):
     out += '\n'.join(app['code'])
     # out += '\noutputs = [{}]'.format(','.join(o['id'] for o in app['outputs']))
     out += '\n{}'.format(postfix_code)
+
+    print (out)
     return out
 
 

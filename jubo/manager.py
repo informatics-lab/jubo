@@ -1,5 +1,6 @@
 import os
 from kubernetes import client, config
+from kubernetes.client.rest import ApiException
 from uuid import uuid4 as uuid
 import time
 import logging
@@ -34,8 +35,12 @@ def get_app_info(app_id):
     return start_up_app(app_id)
 
 def check_pod_ready(pod):
-    pod = kube.read_namespaced_pod(pod.metadata.name, pod.metadata.namespace)
-    return pod_is_ready(pod)
+    try:
+        pod = kube.read_namespaced_pod(pod.metadata.name, pod.metadata.namespace)
+        return pod_is_ready(pod)
+    except ApiException:
+        return False
+    
 
 def pod_is_ready(pod):
     ready =  pod.status.phase == 'Running' and pod.status.pod_ip

@@ -3,3 +3,63 @@
     flex-direction: column;
     overflow: auto;
 }
+
+.jubo-view-element {
+    border: rgba(39, 39, 39, 0.5) solid 1px;
+    margin: 0.2em;
+    padding: 0.2em;
+    background: white;
+    overflow: auto;
+}
+
+.jubo-layout-panel {
+    overflow: auto;
+}
+
+.jubo-layout-panel .jp-InputPrompt,
+.jubo-layout-panel .jp-OutputPrompt,
+.jubo-layout-panel .jp-Cell-inputCollapser {
+    display: none;
+}
+
+.jubo-layout-hidden {
+    opacity: 0.25;
+}
+
+.jubo-layout-row {
+    border: #333 dashed 1px;
+    margin: 0.2em;
+    padding: 0.2em;
+    background: #CCC;
+    display: flex;
+    min-height: 5em;
+}
+
+
+/* Dragula */
+
+.gu-mirror {
+    position: fixed !important;
+    margin: 0 !important;
+    z-index: 9999 !important;
+    opacity: 0.8;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+    filter: alpha(opacity=80);
+}
+
+.gu-hide {
+    display: none !important;
+}
+
+.gu-unselectable {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+.gu-transit {
+    opacity: 0.2;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+    filter: alpha(opacity=20);
+}

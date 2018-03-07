@@ -118,8 +118,9 @@ class LocalProxyHandler(WebSocketHandlerMixin, web.RequestHandler):
         if self.request.headers.get("Upgrade", "").lower() == 'websocket':
             # We wanna websocket!
             # TODO: WebSocketProxyHandler doesn't exist https://github.com/jupyterhub/nbserverproxy/issues/13
-            ws = WebSocketProxyHandler(*self._init_args, **self._init_kwargs)
-            return await ws.get(client_info, proxied_path)
+            # ws = WebSocketProxyHandler(*self._init_args, **self._init_kwargs)
+            # return await ws.get(client_info, proxied_path)
+            raise RuntimeError("This code path isn't implemented....")
 
         body = self.request.body
         if not body:

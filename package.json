@@ -31,7 +31,13 @@
     },
     "dependencies": {
         "@jupyterlab/application": "^0.15.0",
-        "@jupyterlab/notebook": "^0.15.6"
+        "@jupyterlab/docmanager": "^0.15.5",
+        "@jupyterlab/notebook": "^0.15.7",
+        "@types/codemirror": "0.0.55",
+        "@types/dragula": "^2.1.33",
+        "draggable": "^4.2.0",
+        "dragula": "^3.7.2",
+        "html5sortable": "^0.8.1"
     },
     "devDependencies": {
         "rimraf": "^2.6.1",
