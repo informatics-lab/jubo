@@ -1,7 +1,7 @@
 
 # JuBo
 
-A suite of tools for building and deploying Bokeh apps from Jupyter notebooks using JupyterLabs.
+A suite of tools for building and deploying Bokeh apps from Jupyter notebooks using JupyterLabs. It's an experiment to explore a way of quickly and easily creating sharable services from withing Jupyter Lab. 
 
 Three main components parts:
 * **JuBo Lab** - A JupyterLab extension. Under the `src` directory.
@@ -9,14 +9,19 @@ Three main components parts:
     * **Jubo Server** - `jubo_server_ext.py` - A JupyterServer extension that works with the lab extension to convert and server Bokeh apps from notebooks and 'deploy' by pushing into an S3 bucket. 
     * **Jubo deployer** - `proxy.py` - A Tornado server that is expecting to run on a Kubernetes cluster. This will spin up, deploy, proxy to and tidy up the bokeh apps built. There is a Helm Chart to deploy this in the `kube` dir.
 
+## A demo
+![A very simple JuBo app](https://images.informaticslab.co.uk/MyFirstApp.gif)
+
 
 ## Assumptions/external setup requirements
 
 ## Installation
 
+```
 pip install git+https://github.com/met-office-lab/jubo.git --user
 jupyter serverextension enable --py jubo --user
 
+```
 
 ## Development
 
